@@ -1,0 +1,213 @@
+"""
+step4_delta_chi2.py
+===================
+Compute the BPB rotation-curve chi2 improvement for 38 active galaxies.
+
+For each active galaxy:
+    V200_BPB = V200_ref * (1 + alpha * dR1)
+    alpha_rule   = -sign_pred * |Areq|   if sign correct, else 0 (gate)
+    alpha_oracle = -sign_true * |Areq|   (always applied)
+
+    delta_chi2_rule(i)   = chi2(alpha_rule)   - chi2_ref
+    delta_chi2_oracle(i) = chi2(alpha_oracle) - chi2_ref
+
+Amplitude used: |Areq_v_best| from per_galaxy_v200_required_amplitude.csv
+This is the scan optimum — single consistent definition throughout.
+
+Inputs (in results/chains/):
+    MassModels_Lelli2016c.mrt
+    sparc_reference_halo_table_nfw_lcdm_clean.csv
+    bpb_correction_proxy_grid_z0.csv
+    per_galaxy_v200_required_amplitude.csv
+    loo_predictions.csv                    (output of step2)
+
+Output (in results/chains/):
+    delta_chi2_per_galaxy.csv   [name, dR1, Areq, sign_pred, sign_true,
+                                  correct, dchi2_rule, dchi2_oracle]
+
+Usage (from repo root):
+    python pipeline/step4_delta_chi2.py
+"""
+
+import math
+import os
+import numpy as np
+import pandas as pd
+
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT  = os.path.dirname(SCRIPT_DIR)
+CHAINS     = os.path.join(REPO_ROOT, "results", "chains")
+
+MRT_PATH   = os.path.join(CHAINS, "MassModels_Lelli2016c.mrt")
+REF_PATH   = os.path.join(CHAINS, "sparc_reference_halo_table_nfw_lcdm_clean.csv")
+PROXY_PATH = os.path.join(CHAINS, "bpb_correction_proxy_grid_z0.csv")
+V200_PATH  = os.path.join(CHAINS, "per_galaxy_v200_required_amplitude.csv")
+LOO_PATH   = os.path.join(CHAINS, "loo_predictions.csv")
+OUT_PATH   = os.path.join(CHAINS, "delta_chi2_per_galaxy.csv")
+
+for p in [MRT_PATH, REF_PATH, PROXY_PATH, V200_PATH, LOO_PATH]:
+    if not os.path.exists(p):
+        raise FileNotFoundError(
+            f"\nMissing: {p}\n"
+            f"Run steps 1-2 first and place all inputs in {CHAINS}/")
+
+# ---------------------------------------------------------------------------
+# Load
+# ---------------------------------------------------------------------------
+print("Loading inputs ...")
+loo   = pd.read_csv(LOO_PATH)
+ref   = pd.read_csv(REF_PATH).set_index('name')
+proxy = pd.read_csv(PROXY_PATH)
+v200  = pd.read_csv(V200_PATH)
+
+# dR1 interpolation grid
+g_logM = proxy['logM200'].values
+g_dR1  = proxy['delta_bpb_effective_R1'].values
+
+# logM200 per galaxy from v200
+logM_map = dict(zip(v200['name'], v200['logM200']))
+
+# ---------------------------------------------------------------------------
+# Parse MRT — load only active galaxies
+# ---------------------------------------------------------------------------
+active_names = set(loo['name'])
+mrt_pts = {}
+print(f"Parsing MRT for {len(active_names)} active galaxies ...")
+with open(MRT_PATH) as f:
+    for line in f:
+        line = line.rstrip('\r\n')
+        if len(line) < 59 or not line[0].isalpha():
+            continue
+        try:
+            name = line[0:11].strip()
+            if name not in active_names:
+                continue
+            if name not in mrt_pts:
+                mrt_pts[name] = []
+            mrt_pts[name].append({
+                'R':     float(line[19:25]),
+                'Vobs':  float(line[26:32]),
+                'eVobs': float(line[33:38]),
+                'Vgas':  float(line[39:45]),
+                'Vdisk': float(line[46:52]),
+                'Vbul':  float(line[53:59]),
+            })
+        except:
+            continue
+
+print(f"  Loaded rotation curves for {len(mrt_pts)} galaxies")
+
+# ---------------------------------------------------------------------------
+# NFW velocity
+# ---------------------------------------------------------------------------
+def nfw_v(r, V200, C200, rs):
+    def f(u): return math.log(1.0 + u) - u / (1.0 + u)
+    if not all(math.isfinite(x) and x > 0 for x in [r, V200, C200, rs]):
+        return math.nan
+    x  = r / (C200 * rs)
+    u  = r / rs
+    fc = f(C200)
+    fu = f(u)
+    if x <= 0 or fc <= 0 or fu < 0:
+        return math.nan
+    return math.sqrt(max(V200**2 * fu / (x * fc), 0.0))
+
+# ---------------------------------------------------------------------------
+# Chi2 at given alpha
+# ---------------------------------------------------------------------------
+def chi2_at(name, alpha, V200, C200, rs, Ydisk, Ybul, dR1):
+    ratio = 1.0 + alpha * dR1
+    if ratio <= 0:
+        return 1e10
+    V200_b = V200 * ratio
+    rs_b   = rs   * ratio          # c200 unchanged, rs scales with V200
+    c2 = 0.0
+    for p in mrt_pts.get(name, []):
+        vh = nfw_v(p['R'], V200_b, C200, rs_b)
+        if not math.isfinite(vh):
+            return 1e10
+        vbar2 = (p['Vgas']**2
+                 + Ydisk * p['Vdisk']**2
+                 + Ybul  * p['Vbul']**2)
+        vpred = math.sqrt(max(vbar2 + vh**2, 0.0))
+        c2   += ((vpred - p['Vobs']) / p['eVobs'])**2
+    return c2
+
+# ---------------------------------------------------------------------------
+# Compute delta chi2 for each active galaxy
+# ---------------------------------------------------------------------------
+print("Computing delta chi2 ...")
+results = []
+
+for _, row in loo.iterrows():
+    name       = row['name']
+    sign_pred  = int(row['sign_pred'])
+    sign_true  = int(row['sign_true'])
+    correct    = bool(row['correct'])
+    Areq       = float(row['Areq'])
+
+    if name not in ref.index or name not in logM_map:
+        print(f"  SKIP {name}: not in ref or logM map")
+        continue
+
+    r      = ref.loc[name]
+    V200   = float(r['V200'])
+    C200   = float(r['C200'])
+    rs     = float(r['rs'])
+    Ydisk  = float(r.get('Ydisk', 0.0))
+    Ybul   = float(r.get('Ybul',  0.0))
+
+    if not all(math.isfinite(x) and x > 0 for x in [V200, C200, rs]):
+        print(f"  SKIP {name}: invalid NFW params")
+        continue
+
+    if not math.isfinite(Ydisk): Ydisk = 0.0
+    if not math.isfinite(Ybul):  Ybul  = 0.0
+
+    logM = logM_map[name]
+    dR1  = float(np.interp(logM, g_logM, g_dR1)) # type: ignore
+
+    # Amplitude = |Areq_scan| — single definition
+    amp = abs(Areq)
+
+    # alpha: gate wrong-sign predictions at 0
+    alpha_rule   = -(sign_pred * amp) if correct else 0.0
+    alpha_oracle = -(sign_true * amp)
+
+    c2_ref    = chi2_at(name, 0.0,          V200, C200, rs, Ydisk, Ybul, dR1)
+    c2_rule   = chi2_at(name, alpha_rule,   V200, C200, rs, Ydisk, Ybul, dR1)
+    c2_oracle = chi2_at(name, alpha_oracle, V200, C200, rs, Ydisk, Ybul, dR1)
+
+    results.append({
+        'name':         name,
+        'dR1':          round(dR1, 6),
+        'Areq':         round(Areq, 4),
+        'sign_pred':    sign_pred,
+        'sign_true':    sign_true,
+        'correct':      int(correct),
+        'dchi2_rule':   round(c2_rule   - c2_ref, 2),
+        'dchi2_oracle': round(c2_oracle - c2_ref, 2),
+    })
+
+# ---------------------------------------------------------------------------
+# Summary and save
+# ---------------------------------------------------------------------------
+df = pd.DataFrame(results)
+df.to_csv(OUT_PATH, index=False)
+
+total_rule   = df['dchi2_rule'].sum()
+total_oracle = df['dchi2_oracle'].sum()
+pct          = total_rule / total_oracle * 100 if total_oracle != 0 else 0
+
+print(f"\n{'='*50}")
+print(f"DELTA CHI2 RESULTS")
+print(f"{'='*50}")
+print(f"  n galaxies      : {len(df)}")
+print(f"  sign correct    : {df['correct'].sum()}/38")
+print(f"  Δχ²_rule  (38)  : {total_rule:.0f}")
+print(f"  Δχ²_oracle (38) : {total_oracle:.0f}")
+print(f"  rule / oracle   : {pct:.0f}%")
+print(f"\nSaved: {OUT_PATH}")

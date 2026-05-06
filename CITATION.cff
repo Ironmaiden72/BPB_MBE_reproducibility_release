@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this reproducibility capsule, please cite the archived Zenodo release and the associated HAL corpus papers."
+title: "BPB/MBE HAL corpus reproducibility release capsule"
+authors:
+  - family-names: "Pelletier"
+    given-names: "F."
+    affiliation: "Independent Research"
+version: "v2026.05.06"
+date-released: "2026-05-06"
+repository-code: "https://github.com/<OWNER>/BPB_MBE_reproducibility_release"
+license: "MIT"
+keywords:
+  - cosmology
+  - bigravity
+  - reproducibility
+  - HAL
+  - BPB/MBE
+abstract: "Clean reproducibility capsule for the BPB/MBE HAL corpus release, containing final papers, source packages, claim-source locks, release indices and audit scripts."

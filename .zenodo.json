@@ -1,0 +1,20 @@
+{
+  "title": "BPB/MBE HAL corpus reproducibility release capsule",
+  "creators": [
+    {
+      "name": "Pelletier, F.",
+      "affiliation": "Independent Research"
+    }
+  ],
+  "description": "Clean reproducibility capsule for the BPB/MBE HAL corpus release. Contains final papers, source packages, claim-source locks, release indices and audit scripts. Heavy private working-pipeline history is intentionally excluded.",
+  "license": "MIT",
+  "upload_type": "software",
+  "keywords": [
+    "cosmology",
+    "bigravity",
+    "reproducibility",
+    "HAL",
+    "BPB/MBE"
+  ],
+  "version": "v2026.05.06"
+}

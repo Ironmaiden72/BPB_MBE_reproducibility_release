@@ -1,0 +1,9 @@
+paper_id,paper_label,version,pages,version_found_in_pdf_text,double_question,table_??,figure_??,undefined,todo_tbd_placeholder,lowercase_placeholder_nonblocking_count,audit_status,note
+Paper_0,Paper 0,v0.9,27,True,0,0,0,0,0,0,PASS,
+Paper_I,Paper I,v0.4.1,16,True,0,0,0,0,0,1,PASS,One lowercase placeholder-like word appears as non-blocking explanatory prose; no TODO/TBD/?? found.
+Paper_II,Paper II,v0.4.1,15,True,0,0,0,0,0,0,PASS,
+Paper_III,Paper III,v0.4.1,8,True,0,0,0,0,0,0,PASS,
+Paper_IV,Paper IV,v0.4.1,14,True,0,0,0,0,0,0,PASS,
+Paper_V,Paper V,v0.3.2,10,True,0,0,0,0,0,0,PASS,
+Paper_VI,Paper VI,v0.2.1,9,True,0,0,0,0,0,0,PASS,
+Paper_VII,Paper VII,v0.3,12,True,0,0,0,0,0,0,PASS,

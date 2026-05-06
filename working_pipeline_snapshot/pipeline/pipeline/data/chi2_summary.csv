@@ -1,0 +1,5 @@
+rule,minus_dchi2,label,bar_label,n_galaxies,source_csv
+type95,2319,Type-9.5,gate,38,type95_per_galaxy.csv
+physical_rule,2677,Physical rule,strict,38,sparc_active_sample.csv
+oracle_38,2946,Oracle (38),, 38,oracle_38_per_galaxy.csv
+oracle_118,4627,Oracle (118),,118,oracle_118_per_galaxy.csv

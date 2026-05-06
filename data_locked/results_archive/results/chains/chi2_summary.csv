@@ -1,0 +1,5 @@
+rule,minus_dchi2,label,n_galaxies
+physical_v200,4614,"V200-only
+model",38
+full_bpb,26142,"Full BPB
+model",118

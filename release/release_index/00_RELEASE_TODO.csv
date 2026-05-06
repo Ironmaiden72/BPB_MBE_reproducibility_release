@@ -1,0 +1,6 @@
+scope,remaining_task,status
+PAPER_I,global controlled same-data ablation,non-blocking for HAL; useful for referee-proof journal version
+PAPER_III,official full Planck nuisance/foreground MCMC,major future robustness gate; not claimed here
+PAPER_IV,native scalar-tensor Love-number solver,future technical task; strict effective tidal response is current claim
+PAPER_VII,true galaxy-level SPARC RC nuisance/covariance likelihood,future full closure; current claim is fixed-a0 BTFR/interpolation support
+CORPUS,public GitHub with repro_scripts/source_locks before arXiv if desired,auditability enhancement

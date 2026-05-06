@@ -1,20 +1,40 @@
 {
-  "title": "BPB/MBE HAL corpus reproducibility release capsule",
+  "title": "BPB/MBE HAL Corpus Reproducibility Release",
+  "description": "Public reproducibility capsule for the BPB/MBE HAL corpus release v2026.05.06, including the release manifest, claim-source index, locked artefacts, source packages and selected reproduction scripts.",
   "creators": [
     {
-      "name": "Pelletier, F.",
-      "affiliation": "Independent Research"
+      "name": "Pelletier, Fabien",
+      "orcid": "0009-0009-0862-2377"
     }
   ],
-  "description": "Clean reproducibility capsule for the BPB/MBE HAL corpus release. Contains final papers, source packages, claim-source locks, release indices and audit scripts. Heavy private working-pipeline history is intentionally excluded.",
+  "version": "v2026.05.06-hal-corpus",
   "license": "MIT",
-  "upload_type": "software",
   "keywords": [
     "cosmology",
     "bigravity",
+    "BPB/MBE",
     "reproducibility",
-    "HAL",
-    "BPB/MBE"
+    "HAL corpus",
+    "SPARC",
+    "CMB",
+    "neutron stars",
+    "early galaxies"
   ],
-  "version": "v2026.05.06"
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Ironmaiden72/BPB_MBE_reproducibility_release",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://github.com/Ironmaiden72/BPB_MBE_reproducibility_release/releases/tag/v2026.05.06-hal-corpus",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://orcid.org/0009-0009-0862-2377",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    }
+  ]
 }

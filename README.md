@@ -75,3 +75,15 @@ This v2 capsule includes the original release-index layer plus isolated code/dat
 
 See `docs/REPRO_SCOPE_V2_CODE_DATA.md` for the exact reproduction contract and guardrails.
 
+## Citation and archive
+
+Canonical archive DOI:
+
+- Zenodo DOI: [10.5281/zenodo.20048680](https://doi.org/10.5281/zenodo.20048680)
+- GitHub repository: https://github.com/Ironmaiden72/BPB_MBE_reproducibility_release
+- GitHub release: https://github.com/Ironmaiden72/BPB_MBE_reproducibility_release/releases/tag/v2026.05.06-hal-corpus
+- Author ORCID: [0009-0009-0862-2377](https://orcid.org/0009-0009-0862-2377)
+
+Suggested citation:
+
+> Pelletier, F. (2026). *BPB/MBE HAL Corpus Reproducibility Release v2026.05.06*. Zenodo. https://doi.org/10.5281/zenodo.20048680

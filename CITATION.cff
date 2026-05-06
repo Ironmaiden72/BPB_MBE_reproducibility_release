@@ -1,18 +1,21 @@
 cff-version: 1.2.0
-message: "If you use this reproducibility capsule, please cite the archived Zenodo release and the associated HAL corpus papers."
-title: "BPB/MBE HAL corpus reproducibility release capsule"
+message: "If you use this reproducibility capsule, please cite it as below."
+title: "BPB/MBE HAL Corpus Reproducibility Release"
+version: "v2026.05.06-hal-corpus"
+doi: "10.5281/zenodo.20048680"
+url: "https://github.com/Ironmaiden72/BPB_MBE_reproducibility_release"
+date-released: "2026-05-06"
 authors:
   - family-names: "Pelletier"
-    given-names: "F."
-    affiliation: "Independent Research"
-version: "v2026.05.06"
-date-released: "2026-05-06"
-repository-code: "https://github.com/<OWNER>/BPB_MBE_reproducibility_release"
-license: "MIT"
-keywords:
-  - cosmology
-  - bigravity
-  - reproducibility
-  - HAL
-  - BPB/MBE
-abstract: "Clean reproducibility capsule for the BPB/MBE HAL corpus release, containing final papers, source packages, claim-source locks, release indices and audit scripts."
+    given-names: "Fabien"
+    orcid: "https://orcid.org/0009-0009-0862-2377"
+preferred-citation:
+  type: generic
+  title: "BPB/MBE HAL Corpus Reproducibility Release v2026.05.06"
+  authors:
+    - family-names: "Pelletier"
+      given-names: "Fabien"
+      orcid: "https://orcid.org/0009-0009-0862-2377"
+  doi: "10.5281/zenodo.20048680"
+  url: "https://doi.org/10.5281/zenodo.20048680"
+  year: 2026
